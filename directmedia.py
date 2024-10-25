@@ -41,9 +41,11 @@ def get_download_link(url):
 
 def download_file(download_url, output_filename):
     """Download the file using the direct download link."""
-    file = requests.get(download_url, allow_redirects=True)
-    with open(output_filename, 'wb') as f:
-        f.write(file.content)
+    with requests.get(download_url, allow_redirects=True, stream=True) as file:
+        file.raise_for_status()
+        with open(output_filename, 'wb') as f:
+            for chunk in file.iter_content(chunk_size=8192):  
+                f.write(chunk)
     debug_log(f"File downloaded and saved as: {output_filename}")
 
 if __name__ == '__main__':
